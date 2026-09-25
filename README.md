@@ -1,2 +1,2 @@
 # School_pos-Class-Schedule
-Just a student 's toy
+Just a student 's first coding
