@@ -1,0 +1,221 @@
+/* ==========================================================================
+   timetable.css — 课表骨架：冻结表头 + 冻结节次栏 + 网格
+   结构：
+   .tt-scroll       滚动容器（横向 + 纵向）
+     .tt-canvas     画布（宽度 = 节次栏 + 7 天）
+       .tt-head     表头行：.wk-corner + .tt-days
+       .tt-body     主体行：.tt-rail + .tt-cols(7 × .tt-col)
+   ========================================================================== */
+
+.tt-scroll {
+  position: relative;
+  flex: 1 1 0%; /* 撑满卡片剩余高度：高度由布局决定，不受内容影响，避免重排抖动 */
+  min-height: 220px;
+  min-width: 0;
+  overflow: auto;
+  border-radius: inherit;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tt-canvas {
+  width: max-content;
+  min-width: 100%;
+  /*
+   * 每天列宽：默认 --day-min-w；
+   * 当某天存在 N 门时间重叠的课时（--lanes = N），列宽至少 N × --lane-min-w，
+   * 保证分栏后的卡片仍有可读宽度，放不下就交给横向滚动。
+   */
+  --day-w: max(var(--day-min-w), calc(var(--lanes, 1) * var(--lane-min-w)));
+}
+
+/* 表头行 / 主体行共用同一套列宽，保证日列严格对齐 */
+.tt-row {
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+}
+
+/* ---------------- 表头（吸顶） ---------------- */
+.tt-head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.tt-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(var(--day-w), 1fr));
+  background: var(--surface-muted);
+}
+
+/* ---------------- 节次栏（吸左） ---------------- */
+.tt-body {
+  position: relative;
+  align-items: start;
+}
+
+.tt-rail {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  align-self: stretch;
+  background: var(--surface-muted);
+  border-right: 1px solid var(--line);
+}
+
+.slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 4px 2px;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  overflow: hidden;
+}
+
+.slot__no {
+  color: var(--ink-3);
+  font-family: var(--font-num);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.slot__time {
+  font-size: 9.5px;
+  line-height: 1.25;
+  letter-spacing: 0.1px;
+}
+
+/*
+ * 节次栏里的分界线**不是另一条线**：.tt-break 本身从 left:0 一直画到 right:0，
+ * 节次栏那一段就是同一条线的左端，因此不存在两条线对不齐的问题。
+ *
+ * 图层必须盖在吸顶节次栏（.tt-rail z-index:2）之上，否则横向滚动时节次栏会
+ * 把这段线遮掉，看起来像"少了一截"。z-index:3 只在横向滚动把节次栏推出视口时
+ * 才看得见；节次栏贴边时它自己的不透明底色仍然把这段线正常遮住。
+ */
+.tt-break-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* 普通分隔线：1px hairline（保持原样） */
+.tt-break {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  height: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+
+/*
+ * 主线（上午/下午、下午/晚上）：比 hairline 更重，但同样只用一条 2px 的线，
+ * 不新增留白、不改变布局高度。
+ *
+ * 用 margin-top 而不是 transform 上移 1px：绝对定位元素的 transform 会产生
+ * 亚像素栅格化，实测 Firefox 下不同值渲染结果不稳定；margin 走正常布局计算，
+ * 结果可预期。上移 1px 后这条 2px 带的上边缘正好落在原来 1px 线的位置上，
+ * 整条带完全落在两节之间的缝隙里（实测：上边缘不越过上一节课卡片底边）。
+ */
+.tt-break--major {
+  height: 2px;
+  margin-top: -1px;
+  background: var(--break-major-line, var(--line-strong));
+}
+
+/* ---------------- 7 天列 ---------------- */
+.tt-cols {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(var(--day-w), 1fr));
+}
+
+.tt-col {
+  position: relative;
+  min-width: 0;
+}
+
+.tt-col + .tt-col {
+  border-left: 1px solid var(--line);
+}
+
+/* 今天所在列：柔和高亮 */
+.tt-col.is-today {
+  background: var(--accent-soft);
+}
+
+.tt-col.is-today::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--accent-line);
+}
+
+/* 空周提示 */
+.tt-empty {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.tt-empty span {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-4);
+  font-size: 11.5px;
+}
+
+/* 横向滚动时给节次栏加一点边界阴影 */
+.tt-scroll.is-pan-x .tt-rail::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -8px;
+  width: 8px;
+  background: linear-gradient(to right, rgba(24, 28, 25, 0.07), rgba(24, 28, 25, 0));
+  pointer-events: none;
+}
+
+@media (min-width: 720px) {
+  .tt-scroll {
+    min-height: 340px;
+  }
+
+  .slot__no {
+    font-size: 14px;
+  }
+
+  .slot__time {
+    font-size: 10.5px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .slot__no {
+    font-size: 15px;
+  }
+
+  .slot__time {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+}

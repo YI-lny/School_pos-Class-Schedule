@@ -1,0 +1,106 @@
+/* ==========================================================================
+   week-selector.css — 顶部日期栏（周一 ~ 周日 + 日期 + 今天）
+   ========================================================================== */
+
+/* 左上角（节次栏上方）的留白格：只保留与表头一致的分隔线 */
+.wk-corner {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  background: var(--surface-muted);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+/* 每一天的表头 */
+.dh {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 100%;
+  min-width: 0;
+  padding: 10px 4px 9px;
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  color: var(--ink-2);
+  user-select: none;
+}
+
+.tt-days .dh:first-child {
+  border-left: 0;
+}
+
+.dh__week {
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.dh__date {
+  font-family: var(--font-num);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- 今天：星期 / 日期 / 「今天」同时高亮 ---------- */
+.dh.is-today {
+  background: var(--accent-soft);
+}
+
+.dh.is-today .dh__week {
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+.dh.is-today .dh__date {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.dh__flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1px;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+/* 周末文字稍淡，视觉上弱化 */
+.dh.is-weekend .dh__week {
+  color: var(--ink-2);
+  font-weight: 550;
+}
+
+/* ---------- 桌面 ---------- */
+@media (min-width: 1080px) {
+  .dh {
+    padding: 12px 6px 11px;
+    gap: 3px;
+  }
+
+  .dh__week {
+    font-size: 14.5px;
+  }
+
+  .dh__date {
+    font-size: 12.5px;
+  }
+
+  .dh__flag {
+    font-size: 11px;
+    padding: 1.5px 9px;
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "school-pos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "现代、简洁的大学课程表 Web App（原生 ES Module + pdf.js 本地解析 PDF 课表）",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "start": "node scripts/dev-server.mjs",
+    "check": "node scripts/check-layout.mjs",
+    "check:start": "node scripts/check-start-bat.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "timetable",
+    "course-schedule",
+    "school",
+    "vanilla-js"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "pdfjs-dist": "^6.3.289"
+  }
+}

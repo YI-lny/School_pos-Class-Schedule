@@ -1,0 +1,277 @@
+/* ==========================================================================
+   tokens.css — 设计令牌（颜色 / 圆角 / 阴影 / 尺寸 / 字体）
+   所有组件只消费变量，不写死颜色，方便后续做夜间模式 / 主题换肤。
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- 表面 ---------- */
+  --bg-page: #eef0ec;
+  --surface: #ffffff;
+  --surface-muted: #f7f8f5; /* 顶部日期栏 / 左侧节次栏 */
+  --surface-sunken: #f1f2ee;
+
+  /* ---------- 分隔线 ---------- */
+  --line: #e8eae5;
+  --line-strong: #dcdfd9;
+  /* 主线（上午/下午、下午/晚上）：比 hairline 更重、但不刺眼；
+     亮色下由夏令/冬令主题各自覆写色调，这里只是没选季节时的兜底 */
+  --break-major-line: #dcdfd9;
+
+  /* ---------- 文字 ---------- */
+  --ink-1: #1e211f; /* 课程名 / 主要文字 */
+  --ink-2: #5b615c; /* 教师 / 教室 */
+  --ink-3: #969c96; /* 次要说明 */
+  --ink-4: #b6bbb5; /* 时间等最弱信息 */
+
+  /* ---------- 强调色（今天） ---------- */
+  --accent: #2f9e6e;
+  --accent-ink: #217a54;
+  --accent-soft: rgba(47, 158, 110, 0.07);
+  --accent-line: rgba(47, 158, 110, 0.32);
+
+  /* ---------- 课程卡片（默认值，实际由 course-card.js 通过内联变量覆盖） ---------- */
+  --card-bg: #dfe3dc;
+  --card-ink: #2c332e;
+  --card-sub: #4d564f;
+  --card-shadow: 0 1px 2px rgba(24, 28, 25, 0.05);
+
+  /* ---------- 几何 ---------- */
+  --rail-w: 56px; /* 左侧节次栏宽度 */
+  --day-min-w: 90px; /* 单日列最小宽度（手机横向滚动阈值） */
+  --lane-min-w: 86px; /* 同一时间有多门课时，每一栏的最小宽度 */
+  --slot-h: 50px; /* 每节课基准高度 */
+  --slot-gap: 4px; /* 课与课之间的纵向间隙 */
+  --break-extra: 20px; /* 上午 / 下午之间的额外留白 */
+  --card-gap-y: 6px; /* 卡片上下留白 */
+  --card-gap-x: 3px; /* 卡片左右留白（同一时间多门课时用于分栏） */
+  --board-max-h: 1040px; /* 课表卡片最大高度（超大屏幕上不至于拉得过长） */
+
+  /* ---------- 圆角 ---------- */
+  --radius-xs: 6px;
+  --radius-sm: 9px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* ---------- 阴影 ---------- */
+  --shadow-1: 0 1px 2px rgba(24, 28, 25, 0.05);
+  --shadow-2: 0 2px 6px rgba(24, 28, 25, 0.06);
+  --shadow-card: 0 16px 40px -36px rgba(24, 28, 25, 0.45);
+  --shadow-sticky: 0 6px 14px -12px rgba(24, 28, 25, 0.5);
+
+  /* ---------- 字体 ---------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei",
+    "Helvetica Neue", Arial, sans-serif;
+  --font-num: ui-rounded, "SF Pro Rounded", -apple-system, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---------- 平板 ---------- */
+@media (min-width: 720px) {
+  :root {
+    --rail-w: 70px;
+    --day-min-w: 116px;
+    --lane-min-w: 98px;
+    --slot-h: 58px;
+    --slot-gap: 5px;
+    --break-extra: 24px;
+  }
+}
+
+/* ---------- 桌面 ---------- */
+@media (min-width: 1080px) {
+  :root {
+    --rail-w: 78px;
+    --day-min-w: 128px;
+    --lane-min-w: 112px;
+    --slot-h: 60px;
+    --break-extra: 26px;
+    --card-gap-x: 4px;
+  }
+}
+
+/* ==========================================================================
+   季节主题（夏令 / 冬令）
+   只影响"表达当前时间制"的非课程元素：页面与课表背景、时间轴、时间文字、
+   分隔线、时间制按钮。**课程卡片配色完全不参与**（卡片颜色由 course-card 内联注入），
+   因此两套主题下课程卡片的视觉语义完全一致。
+   同样的布局 / 字体 / 组件结构，只换颜色。
+   ========================================================================== */
+
+:root[data-season="summer"] {
+  --season-page: #f4f1ea; /* 暖色、明亮 */
+  --season-surface: #fffdf9;
+  --season-muted: #faf6ee;
+  --season-line: #ece5d9;
+  --break-major-line: #d9cfbb; /* 主线：比 hairline(--season-line) 明显、但不刺眼 */
+  --season-time: #a3968a;
+  --season-btn-bg: #fdf3e0;
+  --season-btn-ink: #a9762f;
+  --season-btn-line: rgba(196, 148, 72, 0.35);
+  --season-chip-bg: rgba(196, 148, 72, 0.16);
+  --season-chip-ink: #9a6b26;
+}
+
+:root[data-season="winter"] {
+  --season-page: #edf1f5; /* 冷色、清爽 */
+  --season-surface: #fdfeff;
+  --season-muted: #f5f8fb;
+  --season-line: #e1e7ee;
+  --break-major-line: #c9d5e2; /* 主线：比 hairline(--season-line) 明显、但不刺眼 */
+  --season-time: #8f9dab;
+  --season-btn-bg: #edf4fb;
+  --season-btn-ink: #3f6d9e;
+  --season-btn-line: rgba(96, 145, 196, 0.35);
+  --season-chip-bg: rgba(96, 145, 196, 0.16);
+  --season-chip-ink: #37628f;
+}
+
+/* 季节色调只作用于浅色主题；深色主题保持自己的配色，避免两套主题打架 */
+:root[data-season]:not([data-theme="dark"]) body {
+  background: var(--season-page);
+}
+
+:root[data-season]:not([data-theme="dark"]) .board {
+  background: var(--season-surface);
+}
+
+:root[data-season]:not([data-theme="dark"]) .tt-rail,
+:root[data-season]:not([data-theme="dark"]) .wk-corner,
+:root[data-season]:not([data-theme="dark"]) .tt-days {
+  background: var(--season-muted);
+}
+
+:root[data-season]:not([data-theme="dark"]) .slot__no {
+  color: var(--season-time);
+}
+
+:root[data-season]:not([data-theme="dark"]) .slot__time {
+  color: var(--season-time);
+}
+
+:root[data-season]:not([data-theme="dark"]) .tt-rail,
+:root[data-season]:not([data-theme="dark"]) .wk-corner,
+:root[data-season]:not([data-theme="dark"]) .dh,
+:root[data-season]:not([data-theme="dark"]) .tt-col + .tt-col,
+:root[data-season]:not([data-theme="dark"]) .board__foot {
+  border-color: var(--season-line);
+}
+
+:root[data-season]:not([data-theme="dark"]) .tt-break {
+  background: var(--season-line);
+}
+
+/* 时间制按钮：当前季节的色调 */
+:root[data-season]:not([data-theme="dark"]) .text-btn[data-action="toggle-season"] {
+  background: var(--season-btn-bg);
+  color: var(--season-btn-ink);
+  box-shadow: inset 0 0 0 1px var(--season-btn-line);
+}
+
+/*
+ * 晚上分界提示（🌙 晚上 / ☀️ 中午）：轻量、不喧宾夺主。两条线共用这一套样式。
+ *
+ * 定位语义：贴在各自分界线的**右端**（不是节次栏里，也不在时间节点之间）——
+ *   ──────────────────────────  ☀️ 中午
+ *   ──────────────────────────  🌙 晚上
+ * 水平：.tt-break 是 left:0→right:0 的整行横线，right:6px 即"线的右端往左 6px"。
+ * 垂直：.tt-break 高 2px，top/bottom 对称外扩 8px → 标签中线 = 分界线中心线。
+ * 绝对定位不参与布局流：2px 线本身、.tt-break-layer、课表总高都不受影响。
+ *
+ * 背景必须**不透明**：标签压在分界线上，半透明底会让 2px 线从文字/标签框中间穿过。
+ * 因此用 --season-btn-bg（夏令 #fdf3e0 / 冬令 #edf4fb，都是不带 alpha 的实色），
+ * 它同样表达"一天中的时段"，与工具栏的时间制按钮同色同源；
+ * 夜间主题下季节色不生效，回落到不透明的 --surface-muted。
+ */
+.tt-break__label {
+  position: absolute;
+  right: 6px;
+  top: -8px;
+  bottom: -8px;
+  display: flex;
+  align-items: center;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: var(--season-btn-bg, var(--surface-muted));
+  color: var(--season-chip-ink, var(--ink-3));
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   季节切换的平滑过渡：只过渡颜色属性，不使用全属性过渡，也不碰卡片动画
+   ========================================================================== */
+
+body,
+.board,
+.tt-rail,
+.wk-corner,
+.tt-days,
+.dh,
+.slot__no,
+.slot__time,
+.tt-break,
+.tt-col,
+.board__foot,
+.text-btn[data-action="toggle-season"] {
+  transition: background-color 0.3s var(--ease), color 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .board,
+  .tt-rail,
+  .wk-corner,
+  .tt-days,
+  .dh,
+  .slot__no,
+  .slot__time,
+  .tt-break,
+  .tt-col,
+  .board__foot,
+  .text-btn[data-action="toggle-season"] {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   夜间模式：只覆盖变量。
+   由 src/core/course-store.js 写入 <html data-theme="dark">。
+   ========================================================================== */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-page: #14171a;
+  --surface: #1b1f22;
+  --surface-muted: #212528;
+  --surface-sunken: #191d20;
+
+  --line: #2a2f33;
+  --line-strong: #343a3f;
+  /* 主线（上午/下午、下午/晚上）：夜间主题下同样"更重但不刺眼" */
+  --break-major-line: #454d53;
+
+  --ink-1: #eceeec;
+  --ink-2: #a9afab;
+  --ink-3: #7c827e;
+  --ink-4: #626864;
+
+  --accent: #4ec38d;
+  --accent-ink: #7ad9ac;
+  --accent-soft: rgba(78, 195, 141, 0.1);
+  --accent-line: rgba(78, 195, 141, 0.36);
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 20px 46px -40px rgba(0, 0, 0, 0.85);
+  --shadow-sticky: 0 8px 16px -14px rgba(0, 0, 0, 0.9);
+}
